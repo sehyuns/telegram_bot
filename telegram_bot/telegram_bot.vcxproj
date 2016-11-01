@@ -151,6 +151,7 @@
     <ClInclude Include="codes\custom_string.h" />
     <ClInclude Include="codes\json\json-forwards.h" />
     <ClInclude Include="codes\json\json.h" />
+    <ClInclude Include="codes\parser.h" />
     <ClInclude Include="codes\singleton.h" />
     <ClInclude Include="codes\telegram_connector.h" />
     <ClInclude Include="stdafx.h" />

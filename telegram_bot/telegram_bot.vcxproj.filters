@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="codes">
       <UniqueIdentifier>{c68fc19b-468e-404c-94a5-4cc0356ebf54}</UniqueIdentifier>
     </Filter>
@@ -43,6 +39,9 @@
       <Filter>codes\json</Filter>
     </ClInclude>
     <ClInclude Include="codes\custom_string.h">
+      <Filter>codes</Filter>
+    </ClInclude>
+    <ClInclude Include="codes\parser.h">
       <Filter>codes</Filter>
     </ClInclude>
   </ItemGroup>
