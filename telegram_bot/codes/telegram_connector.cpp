@@ -183,6 +183,8 @@ namespace Main
 			if (!instance()->validate_last_seq(update_id))
 				continue;
 
+			instance()->update_last_message()
+
 			cout << "update id: " << ii["update_id"] << endl;
 			Json::Value message = ii["message"];
 			cout << "message id: " << message["message_id"] << endl;

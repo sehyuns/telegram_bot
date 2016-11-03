@@ -45,6 +45,8 @@ namespace Main
 		VOID		update_last_seq(INT32 seq_in);
 		BOOL		validate_last_seq(INT32 seq_in);
 
+		VOID		update_last_message(const string& message_in)		{ last_message = message_in; }
+
 	protected:
 		//! @brief	텔레그램으로부터 도착한 메세지를 처리하기 위한 콜백. 초기화 메세지를 처리함.
 		//! @param	contents_in[IN]	도착한 메세지 포인터
@@ -58,6 +60,8 @@ namespace Main
 	private:
 		CURL*		_curl;
 		INT32		_last_update;
+
+		string		last_message;
 	};
 
 }
