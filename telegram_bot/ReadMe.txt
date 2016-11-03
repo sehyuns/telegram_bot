@@ -47,7 +47,7 @@ Code Convention
 2. 클래스명은 예외적으로 낙타를 사용한다.(C로 시작하지 말것.)
 3. 함수명 및 변수의 맴버 여부는 앞의 언더바로 구분한다.
 4. 함수 인자의 경우는 _in, _out 을 끝에 붙여서 인자의 성격을 알려준다.
-5. TCHAR 를 기본으로 사용한다.(이와 관련된 API 들도 모두 포함.) string의 경우 typedef basic_string<TCHAR> STRING 을 사용한다.
+5. TCHAR 를 기본으로 사용한다.(이와 관련된 API 들도 모두 포함.) string의 경우 typedef basic_string<TCHAR> string 을 사용한다.
 6. 데이터 타입은 윈도우 표준인 대문자로 사용한다.(INT8, INT16, INT32, INT64, 등등)
 7. doxygen 형식의 주석으로 코드를 문서화 한다.
 

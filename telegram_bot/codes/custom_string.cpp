@@ -50,42 +50,42 @@ const char SAFE[256] =
 	/* F */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
 };
 
-STRING CustomString::trim(__in STRING& s, __in const STRING& drop /*= " " */)
+string CustomString::trim(__in string& s, __in const string& drop /*= " " */)
 {
-	STRING r = s.erase(s.find_last_not_of(drop) + 1);
+	string r = s.erase(s.find_last_not_of(drop) + 1);
 	return r.erase(0, r.find_first_not_of(drop));
 }
 
-STRING CustomString::rtrim(__in STRING s, __in const STRING& drop /*= " " */)
+string CustomString::rtrim(__in string s, __in const string& drop /*= " " */)
 {
-	STRING r = s.erase(s.find_last_not_of(drop) + 1);
+	string r = s.erase(s.find_last_not_of(drop) + 1);
 	return r;
 }
 
-STRING CustomString::ltrim(__in STRING s, __in const STRING& drop /*= " " */)
+string CustomString::ltrim(__in string s, __in const string& drop /*= " " */)
 {
-	STRING r = s.erase(0, s.find_first_not_of(drop));
+	string r = s.erase(0, s.find_first_not_of(drop));
 	return r;
 }
 
-STRING CustomString::trim_custom(__in STRING& s, __in const STRING& drop /*= " " */)
+string CustomString::trim_custom(__in string& s, __in const string& drop /*= " " */)
 {
-	STRING r = s.erase(0, s.find_first_not_of(L" "));
-	r = r.erase(0, r.find_first_not_of(L"\n"));
+	string r = s.erase(0, s.find_first_not_of(" "));
+	r = r.erase(0, r.find_first_not_of("\n"));
 	r = r.erase(r.find_last_not_of(drop) + 1);
-	r = r.erase(r.find_last_not_of(L"\n") + 1);
-	r = CustomString::replace_all(r, L"\n \n", L"\n");
-	r = CustomString::replace_all(r, L"\n\n", L"\n");
+	r = r.erase(r.find_last_not_of("\n") + 1);
+	r = CustomString::replace_all(r, "\n \n", "\n");
+	r = CustomString::replace_all(r, "\n\n", "\n");
 	return r.erase(0, r.find_first_not_of(drop));
 }
 
-STRING CustomString::replace_all(__in const STRING &message, __in const STRING &pattern, __in const STRING &replace)
+string CustomString::replace_all(__in const string &message, __in const string &pattern, __in const string &replace)
 {
-	STRING result = message;
-	STRING::size_type pos = 0;
-	STRING::size_type offset = 0;
+	string result = message;
+	string::size_type pos = 0;
+	string::size_type offset = 0;
 
-	while ((pos = result.find(pattern, offset)) != STRING::npos)
+	while ((pos = result.find(pattern, offset)) != string::npos)
 	{
 		result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
 		offset = pos + replace.size();
@@ -94,9 +94,9 @@ STRING CustomString::replace_all(__in const STRING &message, __in const STRING &
 	return result;
 }
 
-STRING CustomString::urlencode(__in const STRING &source)
+string CustomString::urlencode(__in const string &source)
 {
-	STRING result_string;
+	string result_string;
 
 	char hex[4];
 	for (const char &c : source)
@@ -108,7 +108,7 @@ STRING CustomString::urlencode(__in const STRING &source)
 			result_string += c;
 		else
 		{
-			sprintf_s(hex, L"%%%02X", (unsigned char)c);
+			sprintf_s(hex, "%%%02X", (unsigned char)c);
 			result_string.append(hex);
 		}
 	}
@@ -116,7 +116,7 @@ STRING CustomString::urlencode(__in const STRING &source)
 	return result_string;
 }
 
-STRING CustomString::urldecode(__in const STRING &source)
+string CustomString::urldecode(__in const string &source)
 {
 	// Note from RFC1630: "Sequences which start with a percent
 	// sign but are not followed by two hexadecimal characters
@@ -152,12 +152,12 @@ STRING CustomString::urldecode(__in const STRING &source)
 	while (pSrc < SRC_END)
 		*pEnd++ = *pSrc++;
 
-	STRING sResult(pStart, pEnd);
+	string sResult(pStart, pEnd);
 	delete[] pStart;
 	return sResult;
 }
 
-// STRING UriEncode( const STRING & sSrc )
+// string UriEncode( const string & sSrc )
 // {
 // 	const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
 // 	const unsigned char * pSrc = (const unsigned char *)sSrc.c_str();
@@ -179,14 +179,14 @@ STRING CustomString::urldecode(__in const STRING &source)
 // 		}
 // 	}
 // 
-// 	STRING sResult( (char *)pStart, (char *)pEnd );
+// 	string sResult( (char *)pStart, (char *)pEnd );
 // 	delete[] pStart;
 // 	return sResult;
 // }
 
-STRING CustomString::urlencode2(__in const STRING &source)
+string CustomString::urlencode2(__in const string &source)
 {
-	STRING result_string;
+	string result_string;
 
 	char hex[6];
 	for (const char &c : source)
@@ -198,7 +198,7 @@ STRING CustomString::urlencode2(__in const STRING &source)
 			result_string += c;
 		else
 		{
-			sprintf_s(hex, L"%%25%02X", c);
+			sprintf_s(hex, "%%25%02X", c);
 			result_string.append(hex);
 		}
 	}
@@ -207,9 +207,9 @@ STRING CustomString::urlencode2(__in const STRING &source)
 }
 
 
-STRING CustomString::UTF8ToAnsi(__in STRING _in)
+string CustomString::UTF8ToAnsi(__in string _in)
 {
-	STRING result;
+	string result;
 	int nLength = MultiByteToWideChar(CP_UTF8, 0, _in.c_str(), _in.length() + 1, NULL, NULL);
 	BSTR bstrWide = SysAllocStringLen(NULL, nLength);
 	MultiByteToWideChar(CP_UTF8, 0, _in.c_str(), _in.length() + 1, bstrWide, nLength);
@@ -224,9 +224,9 @@ STRING CustomString::UTF8ToAnsi(__in STRING _in)
 	return result;
 }
 
-STRING CustomString::AnsiToUTF8(__in STRING _in)
+string CustomString::AnsiToUTF8(__in string _in)
 {
-	STRING result;
+	string result;
 	int     nLength, nLength2;
 	BSTR    bstrCode;
 	char*   pszUTFCode = NULL;

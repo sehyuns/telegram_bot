@@ -5,16 +5,16 @@
 class CustomString
 {
 public:
-	static STRING trim(__in STRING& s, __in const STRING& drop = " ");
-	static STRING rtrim(__in STRING s, __in const STRING& drop = " ");
-	static STRING ltrim(__in STRING s, __in const STRING& drop = " ");
-	static STRING trim_custom(__in STRING& s, __in const STRING& drop = " ");
-	static STRING replace_all(__in const STRING &message, __in const STRING &pattern, __in const STRING &replace);
+	static string trim(__in string& s, __in const string& drop);
+	static string rtrim(__in string s, __in const string& drop);
+	static string ltrim(__in string s, __in const string& drop);
+	static string trim_custom(__in string& s, __in const string& drop);
+	static string replace_all(__in const string &message, __in const string &pattern, __in const string &replace);
 
-	static STRING urlencode(__in const STRING &source);
-	static STRING urldecode(__in const STRING &source);
-	static STRING urlencode2(__in const STRING &source);
+	static string urlencode(__in const string &source);
+	static string urldecode(__in const string &source);
+	static string urlencode2(__in const string &source);
 
-	static STRING UTF8ToAnsi(__in STRING _in);
-	static STRING AnsiToUTF8(__in STRING _in);
+	static string UTF8ToAnsi(__in string _in);
+	static string AnsiToUTF8(__in string _in);
 };

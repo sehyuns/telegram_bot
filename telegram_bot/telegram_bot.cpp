@@ -16,6 +16,8 @@ extern "C" FILE * __cdecl __iob_func(void) {
 //////////////////////////////////////////////////////////////////////////
 
 
+using namespace Main;
+
 int main()
 {
 	curl_global_init(CURL_GLOBAL_ALL);
