@@ -7,7 +7,7 @@
 
 
 #define		API_URL			"https://api.telegram.org/bot"
-#define		BOT_TOKEN		"247535923:AAF0YoEezNHOu-2J6XuKFTztloI_lQEZMBI"
+#define		BOT_TOKEN		""
 #define		GET_ME			"/getme"
 #define		GET_UPDATES		"/getUpdates"
 #define		SEND_MESSAGE	"/sendMessage?"
@@ -15,6 +15,8 @@
 
 namespace Main
 {
+	
+	string		TelegramConnector::_last_message;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//! 
@@ -52,7 +54,7 @@ namespace Main
 		}
 
 		string message = "시작합니다. ";
-		send_message(91271537, CustomString::urlencode(CustomString::AnsiToUTF8(message)));
+		send_message(91271537, (CustomString::AnsiToUTF8(message)));
 
 		return true;
 	}
@@ -73,6 +75,8 @@ namespace Main
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	VOID TelegramConnector::monitor(VOID)
 	{
+		parse_string();
+
 		string recv_data;
 		string request = API_URL;
 		request.append(BOT_TOKEN);
@@ -164,11 +168,47 @@ namespace Main
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	SIZE_T	TelegramConnector::http_receive_data(char* contents, SIZE_T size, SIZE_T nmemb, VOID* user_data)
 	{
+
+		_last_message = contents;
 		string contents_str = contents;
 
+		//Json::Reader reader;
+		//Json::Value root;
+		//if (!reader.parse(contents_str, root, false))
+		//{
+		//	cerr << "failed read json result!!" << endl;
+		//}
+
+		//Json::Value result = root["result"];
+
+		//cout << "updates size: " << result.size() << endl;
+
+		//for (auto ii : result)
+		//{
+		//	int update_id = ii["update_id"].asInt();
+		//	if (!instance()->validate_last_seq(update_id))
+		//		continue;
+
+		//	cout << "update id: " << ii["update_id"] << endl;
+		//	Json::Value message = ii["message"];
+		//	cout << "message id: " << message["message_id"] << endl;
+
+		//	Json::Value chat = message["chat"];
+		//	cout << "chat id: " << chat["id"] << endl;
+
+		//	string msg = CustomString::UTF8ToAnsi(message["text"].asString());
+		//	cout << "message: " << msg << endl;
+
+		//	instance()->update_last_seq(update_id);
+		//}
+
+		return size * nmemb;
+	}
+	VOID TelegramConnector::parse_string(VOID)
+	{
 		Json::Reader reader;
 		Json::Value root;
-		if (!reader.parse(contents_str, root, false))
+		if (!reader.parse(_last_message, root, false))
 		{
 			cerr << "failed read json result!!" << endl;
 		}
@@ -183,8 +223,6 @@ namespace Main
 			if (!instance()->validate_last_seq(update_id))
 				continue;
 
-			instance()->update_last_message()
-
 			cout << "update id: " << ii["update_id"] << endl;
 			Json::Value message = ii["message"];
 			cout << "message id: " << message["message_id"] << endl;
@@ -195,9 +233,13 @@ namespace Main
 			string msg = CustomString::UTF8ToAnsi(message["text"].asString());
 			cout << "message: " << msg << endl;
 
+			if (string::npos != msg.find("bot"))
+			{
+				string message = "안녕하세요.  ";
+				send_message(91271537, CustomString::urlencode(CustomString::AnsiToUTF8(message)));
+			}
 			instance()->update_last_seq(update_id);
 		}
-
-		return size * nmemb;
+		return VOID();
 	}
 }

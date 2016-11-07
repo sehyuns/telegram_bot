@@ -45,7 +45,7 @@ namespace Main
 		VOID		update_last_seq(INT32 seq_in);
 		BOOL		validate_last_seq(INT32 seq_in);
 
-		VOID		update_last_message(const string& message_in)		{ last_message = message_in; }
+		VOID		update_last_message(const string& message_in)		{ _last_message = message_in; }
 
 	protected:
 		//! @brief	텔레그램으로부터 도착한 메세지를 처리하기 위한 콜백. 초기화 메세지를 처리함.
@@ -56,12 +56,13 @@ namespace Main
 		static SIZE_T	http_init_data(char* contents_in, SIZE_T size_in, SIZE_T nmemb_in, VOID* user_data_in);
 		static SIZE_T	http_receive_data(char* contents_in, SIZE_T size_in, SIZE_T nmemb_in, VOID* user_data_in);
 
+		VOID		parse_string(VOID);
 
 	private:
 		CURL*		_curl;
 		INT32		_last_update;
 
-		string		last_message;
+		static string		_last_message;
 	};
 
 }
