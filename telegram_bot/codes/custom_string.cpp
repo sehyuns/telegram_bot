@@ -233,13 +233,14 @@ string CustomString::AnsiToUTF8(__in string _in)
 
 	nLength = MultiByteToWideChar(CP_ACP, 0, _in.c_str(), lstrlenA(_in.c_str()) + 1, NULL, NULL);
 	bstrCode = SysAllocStringLen(NULL, nLength);
-	MultiByteToWideChar(CP_ACP, 0, _in.c_str(), lstrlenA(_in.c_str()), bstrCode, nLength);
+	memset(bstrCode, 0, nLength + 2);
+	MultiByteToWideChar(CP_ACP, 0, _in.c_str(), lstrlenA(_in.c_str()) + 1, bstrCode, nLength);
 
 	nLength2 = WideCharToMultiByte(CP_UTF8, 0, bstrCode, -1, pszUTFCode, 0, NULL, NULL);
 
 	pszUTFCode = new char[nLength2 + 1];
 	memset(pszUTFCode, 0, nLength2 + 1);
-	WideCharToMultiByte(CP_UTF8, 0, bstrCode, -1, pszUTFCode, nLength2 - 4, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, bstrCode, -1, pszUTFCode, nLength2, NULL, NULL);
 
 	result = pszUTFCode;
 	delete[] pszUTFCode;

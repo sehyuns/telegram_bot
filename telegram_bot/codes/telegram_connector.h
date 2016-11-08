@@ -13,6 +13,13 @@
 
 namespace Main
 {
+	enum FILE_TYPE
+	{
+		SEQ_FILE,
+		ID_FILE,
+		TYPE_COUNT
+	};
+
 	///////////////////////////////////////////////////////////////////////////
 	//! @class	TelegramConnector
 	//! @brief	싱글턴으로서 텔레그램과 통신을 하기 위한 모듈.
@@ -57,12 +64,16 @@ namespace Main
 		static SIZE_T	http_receive_data(char* contents_in, SIZE_T size_in, SIZE_T nmemb_in, VOID* user_data_in);
 
 		VOID		parse_string(VOID);
+		VOID		parse_command(string& command);
 
 	private:
 		CURL*		_curl;
 		INT32		_last_update;
 
 		static string		_last_message;
+		static FILE*		_file[TYPE_COUNT];
+
+		static string		_bot_identity;
 	};
 
 }

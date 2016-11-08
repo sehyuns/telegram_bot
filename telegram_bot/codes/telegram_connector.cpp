@@ -7,7 +7,6 @@
 
 
 #define		API_URL			"https://api.telegram.org/bot"
-#define		BOT_TOKEN		""
 #define		GET_ME			"/getme"
 #define		GET_UPDATES		"/getUpdates"
 #define		SEND_MESSAGE	"/sendMessage?"
@@ -17,6 +16,8 @@ namespace Main
 {
 	
 	string		TelegramConnector::_last_message;
+	string		TelegramConnector::_bot_identity;
+	FILE*		TelegramConnector::_file[TYPE_COUNT];
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	//! 
@@ -36,10 +37,32 @@ namespace Main
 			return false;
 		}
 
+		char current_dir[1024] = { 0, };
+		GetCurrentDirectoryA(1024, current_dir);
+
+		string file_name = current_dir;
+		file_name.append("\\");
+		file_name.append("bot_seq.txt");
+
+		char buffer[1024] = { 0, };
+		_file[SEQ_FILE] = fopen(file_name.c_str(), "a+");
+		fread(buffer, 1, 1024, _file[SEQ_FILE]);
+
+		_last_update = atoi(buffer);
+
+		file_name = current_dir;
+		file_name.append("\\");
+		file_name.append("bot_id.txt");
+
+		_file[ID_FILE] = fopen(file_name.c_str(), "a+");
+		fgets(buffer, 1024, _file[ID_FILE]);
+
+		_bot_identity = buffer;
+
 		// Get Me
 		string recv_data;
 		string request = API_URL;
-		request.append(BOT_TOKEN);
+		request.append(_bot_identity);
 		request.append(GET_ME);
 
 		curl_easy_setopt(_curl, CURLOPT_URL, request.c_str());
@@ -53,8 +76,7 @@ namespace Main
 			return false;
 		}
 
-		string message = "시작합니다. ";
-		send_message(91271537, (CustomString::AnsiToUTF8(message)));
+		send_message(91271537, "시작합니다.");
 
 		return true;
 	}
@@ -68,6 +90,9 @@ namespace Main
 		{
 			curl_easy_cleanup(_curl);
 		}
+
+		fclose(_file[SEQ_FILE]);
+		fclose(_file[ID_FILE]);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +104,7 @@ namespace Main
 
 		string recv_data;
 		string request = API_URL;
-		request.append(BOT_TOKEN);
+		request.append(_bot_identity);
 		request.append(GET_UPDATES);
 
 		curl_easy_setopt(_curl, CURLOPT_URL, request.c_str());
@@ -118,8 +143,10 @@ namespace Main
 	VOID TelegramConnector::send_message(INT32 chat_id_in, string message_in)
 	{
 		string request = API_URL;
-		request.append(BOT_TOKEN);
+		request.append(_bot_identity);
 		request.append(SEND_MESSAGE);
+
+		message_in = CustomString::AnsiToUTF8(message_in);
 
 		string encoding_STRING = CustomString::replace_all(message_in, "\n", "%20");
 
@@ -172,38 +199,12 @@ namespace Main
 		_last_message = contents;
 		string contents_str = contents;
 
-		//Json::Reader reader;
-		//Json::Value root;
-		//if (!reader.parse(contents_str, root, false))
-		//{
-		//	cerr << "failed read json result!!" << endl;
-		//}
-
-		//Json::Value result = root["result"];
-
-		//cout << "updates size: " << result.size() << endl;
-
-		//for (auto ii : result)
-		//{
-		//	int update_id = ii["update_id"].asInt();
-		//	if (!instance()->validate_last_seq(update_id))
-		//		continue;
-
-		//	cout << "update id: " << ii["update_id"] << endl;
-		//	Json::Value message = ii["message"];
-		//	cout << "message id: " << message["message_id"] << endl;
-
-		//	Json::Value chat = message["chat"];
-		//	cout << "chat id: " << chat["id"] << endl;
-
-		//	string msg = CustomString::UTF8ToAnsi(message["text"].asString());
-		//	cout << "message: " << msg << endl;
-
-		//	instance()->update_last_seq(update_id);
-		//}
-
 		return size * nmemb;
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//! 
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	VOID TelegramConnector::parse_string(VOID)
 	{
 		Json::Reader reader;
@@ -211,17 +212,20 @@ namespace Main
 		if (!reader.parse(_last_message, root, false))
 		{
 			cerr << "failed read json result!!" << endl;
+			return;
 		}
 
 		Json::Value result = root["result"];
 
-		cout << "updates size: " << result.size() << endl;
-
+		int update_id = 0;
 		for (auto ii : result)
 		{
-			int update_id = ii["update_id"].asInt();
-			if (!instance()->validate_last_seq(update_id))
+			update_id = ii["update_id"].asInt();
+			if (!validate_last_seq(update_id))
+			{
+				update_id = 0;
 				continue;
+			}
 
 			cout << "update id: " << ii["update_id"] << endl;
 			Json::Value message = ii["message"];
@@ -233,12 +237,41 @@ namespace Main
 			string msg = CustomString::UTF8ToAnsi(message["text"].asString());
 			cout << "message: " << msg << endl;
 
-			if (string::npos != msg.find("bot"))
-			{
-				string message = "안녕하세요.  ";
-				send_message(91271537, CustomString::urlencode(CustomString::AnsiToUTF8(message)));
-			}
-			instance()->update_last_seq(update_id);
+			parse_command(msg);
+
+			update_last_seq(update_id);
+		}
+
+		if (0 != update_id)
+		{
+			fpos_t position = 0;
+			fsetpos(_file[SEQ_FILE], &position);
+			string seq = to_string(update_id);
+			fputs(seq.c_str(), _file[SEQ_FILE]);
+			fflush(_file[SEQ_FILE]);
+		}
+		return VOID();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//! 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	VOID TelegramConnector::parse_command(string & command)
+	{
+		SIZE_T pos = string::npos;
+		command = CustomString::ltrim(command);
+
+		if (command[0] != '/')
+			return;
+
+		pos = command.find(" ");
+		string cmd = command.substr(1, pos);
+
+		if ("search" == cmd)
+		{
+			string argument = command.substr(pos + 1);
+
+			cerr << cmd << ", " << argument << endl;
 		}
 		return VOID();
 	}
